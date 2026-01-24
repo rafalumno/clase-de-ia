@@ -92,35 +92,37 @@ class NaiveBayes:
         return predicted_label
 
 
-# Model instance
-model = NaiveBayes()
+# Check if the script is being run directly
+if __name__ == "__main__":
+    # Model instance
+    model = NaiveBayes()
 
-# Example 1: School class classification
-df = pd.read_csv("clases.csv")
-x = df[["horas", "intensidad"]]  # Predictor variables
-y = df["categoria"]  # Target variable
+    # Example 1: School class classification
+    df = pd.read_csv("clases.csv")
+    x = df[["horas", "intensidad"]]  # Predictor variables
+    y = df["categoria"]  # Target variable
 
-model.fit(x, y)  # Training
-prediccion = model.predict([4, 4])  # Prediction for a non-existent class
+    model.fit(x, y)  # Training
+    prediccion = model.predict([4, 4])  # Prediction for a non-existent class
 
-print(f"La categoría predicha es: {prediccion}")  # Print the prediction
+    print(f"La categoría predicha es: {prediccion}")  # Print the prediction
 
-# Example 2: Class classification by grades
-df = pd.read_csv("calificaciones.csv")
-x = df[["grade1", "grade2", "grade3", "grade4"]]  # Predictor variables
-y = df["class_name"]  # Target variable
+    # Example 2: Class classification by grades
+    df = pd.read_csv("calificaciones.csv")
+    x = df[["grade1", "grade2", "grade3", "grade4"]]  # Predictor variables
+    y = df["class_name"]  # Target variable
 
-model.fit(x, y)  # Training
-prediccion = model.predict([10.0, 10.0, 10.0, 10.0])  # Grade prediction
+    model.fit(x, y)  # Training
+    prediccion = model.predict([10.0, 10.0, 10.0, 10.0])  # Grade prediction
 
-print(f"La clase predicha es: {prediccion}")  # Print the prediction
+    print(f"La clase predicha es: {prediccion}")  # Print the prediction
 
-# Example 3: Predicting birth month by name
-df = pd.read_csv("nombres.csv")
-x = df[["name"]]  # Predictor variable
-y = df["month"]  # Target variable
+    # Example 3: Predicting birth month by name
+    df = pd.read_csv("nombres.csv")
+    x = df[["name"]]  # Predictor variable
+    y = df["month"]  # Target variable
 
-model.fit(x, y)  # Training
-prediccion = model.predict(["Jessica"])  # Prediction for a name
+    model.fit(x, y)  # Training
+    prediccion = model.predict(["Jessica"])  # Prediction for a name
 
-print(f"El mes predicho es: {prediccion}")  # Print the prediction
+    print(f"El mes predicho es: {prediccion}")  # Print the prediction
