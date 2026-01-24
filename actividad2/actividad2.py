@@ -3,33 +3,35 @@ from pandas.core.series import Series
 import pandas as pd
 
 
-# Implementación de un clasificador Naive Bayes
+# Implementation of a Naive Bayes classifier
 class NaiveBayes:
     def __init__(self):
-        # Variables para almacenar los datos de entrenamiento
-        self.X = None
-        self.Y = None
+        # Variables to store training data
         self.df = None
+        self.x_column_names = []
+        self.y_column_name = ""
         self.y_ocurrences = {}
         self.y_options_len = 0
 
     def fit(self, X: DataFrame, Y: Series, verbose=False):
-        # Verifica que X y Y sean del tipo correcto
+        # Check that X and Y are of the correct type
         if not isinstance(X, DataFrame):
             raise TypeError("X debe ser un DataFrame de pandas")
         if not isinstance(Y, Series):
             raise TypeError("Y debe ser una Series de pandas")
 
-        # Guarda los datos y los concatena en un solo DataFrame
-        self.X = X
-        self.Y = Y
+        # Concatenate X and Y into a single DataFrame
         self.df = pd.concat([X, Y], axis=1)
 
-        # Obtiene las longitudes de X y Y
+        # Store column names
+        self.x_column_names = X.columns.tolist()
+        self.y_column_name = Y.name
+
+        # Get the lengths of X and Y
         x_length = len(X)
         y_length = len(Y)
 
-        # Validaciones de tamaño por seguridad de datos
+        # Size validations for data safety
         if x_length < 1:
             raise ValueError("X no debe estar vacío")
         if y_length < 1:
@@ -37,88 +39,88 @@ class NaiveBayes:
         if x_length != y_length:
             raise ValueError("X e Y deben tener la misma cantidad de filas")
 
-        # Cuenta cuántas clases únicas hay en Y
+        # Count how many unique classes are in Y
         self.y_options_len = len(Y.unique())
-        # Cuenta las ocurrencias de cada clase en Y
+        # Count the occurrences of each class in Y
         self.y_ocurrences = {}
         for label in Y.unique():
             self.y_ocurrences[label] = int(Y[Y == label].count())
 
-        # Imprime las ocurrencias de cada clase si verbose es True
+        # Print the occurrences of each class if verbose is True
         if verbose:
             print(self.y_ocurrences)
 
     def predict(self, new_data: list, verbose=False):
-        # Verifica que datos sean array
+        # Check that new_data is a list
         if not isinstance(new_data, list):
             raise TypeError("new_data debe ser una lista")
-        # Verifica que los datos sean del tipo aceptado
+        # Check that the data are of accepted types
         for value in new_data:
             if not isinstance(value, (int, float, str)):
                 raise TypeError("Los valores en new_data deben ser int, float o str")
-        # Verifica que la cantidad de datos coincida con las columnas de X
-        if len(new_data) != len(self.X.columns):
+        # Check that the number of values matches the columns in X
+        if len(new_data) != len(self.x_column_names):
             raise ValueError("Cantidad de valores no coincide con contenido en X")
 
-        # Calcula la probabilidad de cada clase dada la nueva información
+        # Dictionary to store probabilities per class
         probabilities = {}
-        # Itera sobre la cantidad de clases en Y
+        # Iterate over the number of classes in Y
         for y_label, y_count in self.y_ocurrences.items():
-            # Inicializa la probabilidad para la clase actual y arma el DataFrame
+            # Initialize the probability for the current class and build the DataFrame
             prob = 1
-            df_per_y = self.df[self.df[self.Y.name] == y_label]
+            df_per_y = self.df[self.df[self.y_column_name] == y_label]
 
-            # Itera sobre cada valor en new_data
+            # Iterate over each value in new_data
             for i, x_value in enumerate(new_data):
-                # Guarda el nombre de la columna
-                x_label = self.X.columns[i]
-                # Cuenta cuántas veces aparece el valor de new_data en la columna actual
+                # Store the column name
+                x_label = self.x_column_names[i]
+                # Count how many times the value of new_data appears in the current column
                 series_per_x = df_per_y[x_label]
                 x_count = int(series_per_x[series_per_x == x_value].count())
-                # Aplica suavizado de Laplace y lo imprime si verbose es True
+                # Apply Laplace smoothing and print if verbose is True
                 if verbose:
                     print(f"({x_count} + 1) / ({y_count} + {self.y_options_len})")
                 prob *= (x_count + 1) / (y_count + self.y_options_len)
 
-            # Almacena la probabilidad calculada para la clase actual
+            # Store the calculated probability for the current class
             probabilities[y_label] = prob
-            # Imprime la probabilidad por clase si verbose es True
+            # Print the probability per class if verbose is True
             if verbose:
                 print(f"P({y_label}|X) = {prob}")
-        # Devuelve la clase con mayor probabilidad
+        # Return the class with the highest probability
         predicted_label = max(probabilities, key=probabilities.get)
         return predicted_label
 
 
-# Ejemplo 1: Clasificación de clases escolares
+# Model instance
+model = NaiveBayes()
+
+# Example 1: School class classification
 df = pd.read_csv("clases.csv")
-x = df[["horas", "intensidad"]]  # Variables predictoras
-y = df["categoria"]  # Variable objetivo
+x = df[["horas", "intensidad"]]  # Predictor variables
+y = df["categoria"]  # Target variable
 
-model = NaiveBayes()  # Instancia del modelo
-model.fit(x, y)  # Entrenamiento
-prediccion = model.predict([4, 4])  # Predicción para clase no existente
+model.fit(x, y)  # Training
+prediccion = model.predict([4, 4])  # Prediction for a non-existent class
 
-print(f"La categoría predicha es: {prediccion}")  # Imprime la predicción
+print(f"La categoría predicha es: {prediccion}")  # Print the prediction
 
-# Ejemplo 2: Clasificación de clases por calificaciones
+# Example 2: Class classification by grades
 df = pd.read_csv("calificaciones.csv")
-x = df[["grade1", "grade2", "grade3", "grade4"]]  # Variables predictoras
-y = df["class_name"]  # Variable objetivo
+x = df[["grade1", "grade2", "grade3", "grade4"]]  # Predictor variables
+y = df["class_name"]  # Target variable
 
-model = NaiveBayes()  # Instancia del modelo
-model.fit(x, y)  # Entrenamiento
-prediccion = model.predict([10.0, 10.0, 10.0, 10.0])  # Predicción de calificaciones
+model.fit(x, y)  # Training
+prediccion = model.predict([10.0, 10.0, 10.0, 10.0])  # Grade prediction
 
-print(f"La clase predicha es: {prediccion}")  # Imprime la predicción
+print(f"La clase predicha es: {prediccion}")  # Print the prediction
 
-# Ejemplo 3: Predicción de mes de nacimiento por nombre
+# Example 3: Predicting birth month by name
 df = pd.read_csv("nombres.csv")
-x = df[["name"]]  # Variable predictora
-y = df["month"]  # Variable objetivo
+x = df[["name"]]  # Predictor variable
+y = df["month"]  # Target variable
 
-model = NaiveBayes()  # Instancia del modelo
-model.fit(x, y)  # Entrenamiento
-prediccion = model.predict(["Jessica"])  # Predicción para un nombre
+model.fit(x, y)  # Training
+prediccion = model.predict(["Jessica"])  # Prediction for a name
 
-print(f"El mes predicho es: {prediccion}")  # Imprime la predicción
+print(f"El mes predicho es: {prediccion}")  # Print the prediction
