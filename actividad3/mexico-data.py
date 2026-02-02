@@ -1,6 +1,13 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
+
+
+def save_plot(fig, filename):
+    if not os.path.exists(filename):
+        fig.savefig(filename, bbox_inches="tight")
+
 
 df = pd.read_csv("world_happiness_combined.csv", sep=";").dropna()
 
@@ -32,8 +39,10 @@ gdp.plot(
     color=["gray" if country != "Mexico" else "red" for country in gdp.index],
 )
 plt.ylabel("PIB per cápita")
+save_plot(plt.gcf(), "1.png")
 plt.show()
-# R: México se encuentra en la posición 9 dentro de los países más ricos de América Latina.
+# R: México se encuentra en la posición 9 dentro de los países más ricos de
+# América Latina según el PIB per cápita.
 
 # 2. ¿Cuál es la relación entre Generosidad y Felicidad en México a través de los años?
 mexico.plot(
@@ -45,8 +54,10 @@ mexico.plot(
 plt.xlabel("Año")
 plt.ylabel("Puntaje")
 plt.legend(["Índice de Felicidad", "Generosidad"])
+save_plot(plt.gcf(), "2.png")
 plt.show()
-# R: En México, la generosidad no afecta a la felicidad porque la generosidad se mantiene estáble mientras que la felicidad varía.
+# R: En México, la generosidad no afecta a la felicidad porque la generosidad
+# se mantiene estáble mientras que la felicidad varía.
 
 # 3. ¿Cuál es el factor que más contribuye a la felicidad en México?
 sns.heatmap(
@@ -56,8 +67,10 @@ sns.heatmap(
     fmt=".2f",
 )
 plt.title("Correlación de factores de felicidad en México")
+save_plot(plt.gcf(), "3.png")
 plt.show()
-# R: El factor que más contribuye a la felicidad en México es el PIB per cápita (GDP per capita).
+# R: El factor que más contribuye a la felicidad en México según el mapa de
+# calor es el PIB per cápita (GDP per capita).
 
 # 4. Listado de países más corruptos de América Latina y donde se encuentra México.
 corruption = (
@@ -71,8 +84,10 @@ corruption.plot(
     color=["gray" if country != "Mexico" else "red" for country in corruption.index],
 )
 plt.ylabel("Percepción de corrupción")
+save_plot(plt.gcf(), "4.png")
 plt.show()
-# R: México se encuentra en la posición 5 dentro de los países más corruptos de América Latina.
+# R: México se encuentra en la posición 5 dentro de los países más corruptos de
+# América Latina de acuerdo al índice de percepción del dataset.
 
 # 5. ¿Ha aumentado o disminuido la felicidad en México a través de los años?
 mexico.plot(
@@ -85,8 +100,11 @@ mexico.plot(
 )
 plt.xlabel("Año")
 plt.ylabel("Índice de felicidad")
+save_plot(plt.gcf(), "5.png")
 plt.show()
-# R: La felicidad en México ha disminuido a través de los años. Comenzando en 2015 en su punto más alto y con descensos notables en 2018 y 2022 con una mejora en 2023 y 2024.
+# R: La felicidad en México ha disminuido a través de los años. Comenzando en
+# 2015 en su punto más alto y con descensos notables en los años 2018 y 2022
+# con una mejora para los últimos años 2023 y 2024.
 
 # 6. Comparación de la felicidad de México con el promedio regional.
 latin_without_mexico.groupby("Year")["Happiness score"].mean().plot(
@@ -102,8 +120,10 @@ plt.legend(["Promedio América Latina", "México"])
 plt.xlabel("Año")
 plt.ylabel("Índice de felicidad")
 plt.title("Índice de felicidad: México vs Promedio de América Latina")
+save_plot(plt.gcf(), "6.png")
 plt.show()
-# R: La felicidad en México es superior al promedio de América Latina en todos los años, aunque incluye más variabilidad.
+# R: La felicidad en México es superior al promedio de América Latina en todos
+# los años, aunque incluye esta más variabilidad.
 
 # 7. ¿El PIB per cápita afecta el soporte social en México?
 sns.regplot(
@@ -114,8 +134,10 @@ sns.regplot(
     line_kws={"color": "red"},
 )
 plt.title("Soporte social vs PIB per cápita en México")
+save_plot(plt.gcf(), "7.png")
 plt.show()
-# R: En México, cuando el PIB per cápita aumenta, el soporte social parece decreser.
+# R: En México, cuando el PIB per cápita aumenta, el soporte social parece
+# decreser, indicando una relación negativa entre ambos factores.
 
 # 8. ¿Cuál ha sido el factor con más variabilidad en México a través de los años?
 mexico[float_cols].std().sort_values(ascending=False).plot(
@@ -123,8 +145,11 @@ mexico[float_cols].std().sort_values(ascending=False).plot(
     title="Variabilidad de los factores de felicidad en México a través de los años",
     color="orange",
 )
+plt.xlabel("Desviación estándar")
+save_plot(plt.gcf(), "8.png")
 plt.show()
-# R: El factor con más variabilidad en México ha sido el PIB per cápita (GDP per capita).
+# R: El factor con más variabilidad en México a través de los años ha sido el
+# PIB per cápita (GDP per capita).
 
 # 9. ¿La libertad se traduce en mayor felicidad en México?
 sns.regplot(
@@ -135,8 +160,11 @@ sns.regplot(
     line_kws={"color": "red"},
 )
 plt.title("Índice de felicidad vs Libertad para tomar decisiones en México")
+save_plot(plt.gcf(), "9.png")
 plt.show()
-# R: En México, una mayor libertad para tomar decisiones no significa mayor felicidad.
+# R: En México, una mayor libertad para tomar decisiones no significa mayor
+# felicidad, más bien al contrario, ya que la tendencia muestra una ligera
+# relación negativa entre ambos factores.
 
 # 10. ¿El soporte social se debe al nivel de generosidad en México?
 mexico.plot(
@@ -146,5 +174,8 @@ mexico.plot(
     title="Soporte social vs Generosidad en México a través de los años",
 )
 plt.ylabel("Puntaje")
+save_plot(plt.gcf(), "10.png")
 plt.show()
-# R: No hay evidencia suficiente para afirmar que el soporte social se deba al nivel de generosidad en México, ya que con diferentes niveles de generosidad, el soporte social no obtiene una tendencia positiva o negativa clara.
+# R: No hay evidencia suficiente para afirmar que el soporte social se deba al
+# nivel de generosidad en México, ya que con diferentes niveles de generosidad,
+# el soporte social no obtiene una tendencia positiva o negativa clara.
